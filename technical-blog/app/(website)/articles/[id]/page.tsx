@@ -1,153 +1,190 @@
-import { getPostById } from "@/lib/services/posts";
-import { getAuthor } from "@/lib/services/users";
+import { getArticleById } from "@/lib/services/articles";
+import { getUser } from "@/lib/services/users";
 import { Article } from "@/lib/types/article";
 import { User } from "@/lib/types/user";
-import {
-    Box,
-    Card,
-    Chip,
-    Divider,
-    Typography,
-} from "@mui/material";
+import { Box, Chip, Container, Paper, Typography } from "@mui/material";
 
-export default async function ArticleDetailPage({
-    params,
-}: {
+import Image from "next/image";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+interface Props {
     params: Promise<{ id: string }>;
-}) {
+}
+
+export async function generateMetadata({
+    params,
+}: Props): Promise<Metadata> {
     const { id } = await params;
 
-    const article: Article = await getPostById(Number(id));
-    const author: User = await getAuthor(Number(article.userId));
+    const article = await getArticleById(Number(id));
+
+    if (!article) {
+        return {
+            title: "Article Not Found",
+            description: "The requested article was not found.",
+        };
+    }
+
+    const description = article.body.slice(0, 160);
+
+    return {
+        title: article.title,
+        description,
+
+        openGraph: {
+            title: article.title,
+            description,
+            type: "article",
+        },
+
+        twitter: {
+            card: "summary_large_image",
+            title: article.title,
+            description,
+        },
+    };
+}
+
+export default async function ArticlePage({ params }: Props) {
+    const { id } = await params;
+
+    const article: Article = await getArticleById(Number(id));
+
+    if (!article) {
+        notFound();
+    }
+
+    const author: User = await getUser(Number(article.userId));
 
     const stats = [
         ["Views", article.views],
-        ["Likes", article.reactions?.likes],
-        ["Dislikes", article.reactions?.dislikes],
+        ["Likes", article.reactions?.likes ?? 0],
+        ["Dislikes", article.reactions?.dislikes ?? 0],
     ];
 
     return (
-        <Box
-            component="main"
-            sx={{
-                maxWidth: 1200,
-                mx: "auto",
-                p: { xs: 2, sm: 3, md: 4 },
-            }}
-        >
-            {/* Article */}
-            <Box component="article">
-                <Typography
-                    component="h1"
-                    variant="h5"
-                    sx={{
-                        fontWeight: 600,
-                        mb: 2,
-                    }}
-                >
-                    Article Details
-                </Typography>
+        <main>
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                <article>
+                    <Paper sx={{ p: 4 }}>
+                        <header>
+                            <Typography variant="h5" sx={{ fontWeight: 600 }} gutterBottom>{article.title}</Typography>
+                            <Typography color="text.secondary" sx={{ mb: 3 }}>{article.body}</Typography>
+                        </header>
 
-                <Card
-                    sx={{
-                        p: 3,
-                        borderRadius: 3,
-                        border: "1px solid #e0e0e0",
-                        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.06)",
-                    }}
-                >
-                    {/* Title */}
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                        {article.title}
-                    </Typography>
+                        <section aria-labelledby="tags-heading">
+                            <Typography id="tags-heading" variant="h6" sx={{ mb: 1 }}>
+                                Tags
+                            </Typography>
 
-                    {/* Description */}
-                    <Typography color="text.secondary" sx={{ lineHeight: 1.7, mb: 3 }}>
-                        {article.body}
-                    </Typography>
+                            <Box sx={{ mb: 3 }}>
+                                {article.tags.map((tag: string) => (
+                                    <Chip
+                                        key={tag}
+                                        label={tag}
+                                        size="small"
+                                        sx={{ mr: 1 }}
+                                    />
+                                ))}
+                            </Box>
+                        </section>
 
-                    {/* Tags */}
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                        Tags:
-                    </Typography>
+                        <section aria-labelledby="stats-heading">
+                            <Typography
+                                id="stats-heading"
+                                variant="h6"
+                                sx={{ mb: 1 }}
+                            >
+                                Statistics
+                            </Typography>
 
-                    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 3 }}>
-                        {article.tags?.map((tag) => (
-                            <Chip key={tag} label={tag} size="small" />
-                        ))}
-                    </Box>
-
-                    {/* Stats */}
-                    <Box
-                        sx={{
-                            display: "flex",
-                            gap: 2,
-                            flexWrap: "wrap",
-                        }}
-                    >
-                        {stats.map(([label, value]) => (
                             <Box
-                                key={label}
                                 sx={{
-                                    px: 3,
-                                    py: 1.5,
-                                    minWidth: 100,
-                                    borderRadius: 2,
-                                    bgcolor: "#f5f5f5",
+                                    display: "flex",
+                                    gap: 2,
+                                    mb: 4,
                                 }}
                             >
-                                <Typography variant="caption" color="text.secondary">
-                                    {label}
-                                </Typography>
+                                {stats.map(([label, value]) => (
+                                    <Box
+                                        key={label}
+                                        sx={{
+                                            p: 2,
+                                            width: 120,
+                                            borderRadius: 2,
+                                            bgcolor: "#f5f5f5",
+                                        }}
+                                    >
+                                        <Typography variant="body2" color="text.secondary">
+                                            {label}
+                                        </Typography>
 
-                                <Typography sx={{ fontWeight: 600 }}>
-                                    {value}
-                                </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                            {value}
+                                        </Typography>
+                                    </Box>
+                                ))}
                             </Box>
-                        ))}
-                    </Box>
-                </Card>
-            </Box>
+                        </section>
 
+                        {/* Author */}
+                        {author && (
+                            <section aria-labelledby="author-heading">
+                                <Typography
+                                    id="author-heading"
+                                    variant="h6"
+                                    sx={{ mb: 2 }}
+                                >
+                                    Author
+                                </Typography>
 
-            <Divider sx={{ mb: 3 }} />
+                                <Box
+                                    component="footer"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 2,
+                                        padding: 2,
+                                        border: "1px solid #ddd",
+                                        borderRadius: 2,
+                                    }}
+                                >
+                                    <Image
+                                        src={author.image}
+                                        alt={`${author.firstName} ${author.lastName}`}
+                                        width={60}
+                                        height={60}
+                                        style={{
+                                            borderRadius: "50%",
+                                        }}
+                                    />
 
-            <Typography
-                variant="h5"
-                sx={{
-                    fontWeight: 600,
-                    mb: 3,
-                }}
-            >
-                Author Information
-            </Typography>
+                                    <Box>
+                                        <Typography sx={{ fontWeight: 600 }}>
+                                            {author.firstName}{" "}{author.lastName}
+                                        </Typography>
 
-            <Card
-                sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    border: "1px solid #e0e0e0",
-                    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.06)",
-                }}
-            >
-                {/* Name */}
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Name: {author.firstName}{" "}{author.lastName}
-                </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                        >
+                                            {author.email}
+                                        </Typography>
 
-                {/* Email */}
-                <Typography color="text.secondary" sx={{ lineHeight: 1.7, mb: 3 }}>
-                    Email ID: {author.email}
-                </Typography>
-
-                {/* Company */}
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                    Company Name: {author.company.name}
-                </Typography>
-
-                {/* Profile Image */}
-                <img src={author.image} alt="image" aria-label="author-image" width={200} height={200} style={{ borderRadius: "50%", border: "1px solid #aaa8a8" }} />
-            </Card>
-        </Box>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                        >
+                                            {author.company?.name}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </section>
+                        )}
+                    </Paper>
+                </article>
+            </Container>
+        </main>
     );
 }

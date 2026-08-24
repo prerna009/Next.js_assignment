@@ -1,47 +1,81 @@
-import SearchInput from "@/components/client/SearchInput";
-import ArticleCard from "@/components/server/layouts/ArticleCard";
-import { getPosts } from "@/lib/services/posts"
-import { Article } from "@/lib/types/article";
-import { Box, Typography } from "@mui/material";
+import {
+    Box,
+    Container,
+    Typography,
+} from "@mui/material";
+
+import ArticleList from "@/components/ArticleList";
+import { getArticles } from "@/lib/services/articles";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home",
+
+  description: "Welcome to TechBlog, a technical blog about modern web development.",
+
+  keywords: [
+    "TechBlog",
+    "Next.js",
+    "React",
+    "JavaScript",
+  ],
+
+  authors: [
+    {
+      name: "TechBlog",
+    },
+  ],
+
+  publisher: "TechBlog",
+
+  category: "Technology",
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  alternates: {
+    canonical: "/",
+  },
+
+  openGraph: {
+    title: "TechBlog",
+    description: "Welcome to TechBlog.",
+    url: "/",
+    siteName: "TechBlog",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "TechBlog",
+    description: "Welcome to TechBlog.",
+  },
+};
 
 export default async function HomePage() {
-    const articles = await getPosts();
-
-    const articleList: Article[] = Array.isArray(articles?.posts)
-        ? [...articles.posts]
-            .sort((a, b) => b.id - a.id)
-            .slice(0, 6)
-        : [];
+    const data = await getArticles(1, 6);
 
     return (
-        <Box>
-            <Typography variant="h5" sx={{ fontWeight: 600, m: 2 }}>
-                Latest Articles
-            </Typography>
+        <main>
+            <Container>
+                <Box
+                    component="section"
+                    aria-labelledby="latest-articles"
+                    sx={{ mb: 6 }}
+                >
+                    <Typography
+                        id="latest-articles"
+                        variant="h4"
+                        sx={{ fontWeight: 700, mb: 3 }}
+                    >
+                        Latest Articles
+                    </Typography>
 
-            <Box>
-                <SearchInput />
-            </Box>
-
-            <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                        xs: "1fr",
-                        sm: "repeat(2, 1fr)",
-                        md: "repeat(3, 1fr)",
-                    },
-                    gap: 3,
-                    p: 3,
-                }}
-            >
-                {articleList?.map((article) => (
-                    <ArticleCard
-                        key={article.id}
-                        article={article}
-                    />
-                ))}
-            </Box>
-        </Box>
+                    <ArticleList articles={data.posts} />
+                </Box>
+            </Container>
+        </main>
     );
 }

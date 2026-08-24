@@ -10,3 +10,10 @@ export interface Article {
     views: number;
     userId: number;
 }
+
+export interface ArticlesResponse {
+  posts: Article[];
+  total: number;
+  skip: number;
+  limit: number;
+}

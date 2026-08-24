@@ -1,20 +1,20 @@
-import Footer from "@/components/server/layouts/footer";
-import Header from "@/components/server/layouts/header";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function WebsiteLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode,
+  children: React.ReactNode;
 }) {
-    return (
-        <>
-            <Header />
+  return (
+    <>
+      <Header />
 
-            <main>
-                {children}
-            </main>
-
-            <Footer />
-        </>
-    )
+      <main>
+        {children}
+      </main>
+      
+      <Footer />
+    </>
+  );
 }
