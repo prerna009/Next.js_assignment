@@ -4,17 +4,17 @@ import Link from "next/link";
 export default function NotFound() {
     return (
         <main
-            className="flex min-h-[62vh] items-center justify-center"
+            className="flex min-h-[100vh] items-center justify-center"
             aria-label="Not Found"
         >
             <div className="text-center">
                 <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
-                    Articles Not Found
+                    Page Not Found
                 </Typography>
 
-                <Button variant="contained" size="small">
-                    <Link href={"/articles"}>
-                        Back To Articles
+                <Button variant="contained">
+                    <Link href={"/"}>
+                        Back To Home
                     </Link>
                 </Button>
             </div>

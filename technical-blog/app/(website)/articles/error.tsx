@@ -20,6 +20,7 @@ export default function Error({
         <Box
             sx={{
                 minHeight: "60vh",
+                height: "62vh",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -27,7 +28,7 @@ export default function Error({
             }}
         >
             <Box>
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h5" gutterBottom sx={{ color: "red" }}>
                     Something went wrong
                 </Typography>
 
