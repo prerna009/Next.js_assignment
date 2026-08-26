@@ -28,13 +28,17 @@ export default function ArticleFilters({
 
         params.delete("page");
 
+        params.delete("search");
+
         if (value) {
             params.set("tag", value);
         } else {
             params.delete("tag");
         }
 
-        router.push(`${pathname}?${params.toString()}`);
+        const query = params.toString();
+
+        router.push(query ? `${pathname}?${params.toString()}` : pathname);
     };
 
     return (
@@ -48,6 +52,7 @@ export default function ArticleFilters({
         >
             {/* Search */}
             <SearchInput
+                key={initialSearch}
                 initialValue={initialSearch}
             />
 

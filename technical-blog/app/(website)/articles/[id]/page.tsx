@@ -68,10 +68,10 @@ export default async function ArticlePage({ params }: Props) {
             <Container maxWidth="md" sx={{ py: 4 }}>
                 <article>
                     <Paper sx={{ p: 4 }}>
-                        <header>
+                        <section>
                             <Typography variant="h5" sx={{ fontWeight: 600 }} gutterBottom>{article.title}</Typography>
                             <Typography color="text.secondary" sx={{ mb: 3 }}>{article.body}</Typography>
-                        </header>
+                        </section>
 
                         <section aria-labelledby="tags-heading">
                             <Typography id="tags-heading" variant="h6" sx={{ mb: 1 }}>
@@ -134,13 +134,13 @@ export default async function ArticlePage({ params }: Props) {
                                 <Typography
                                     id="author-heading"
                                     variant="h6"
-                                    sx={{ mb: 2 }}
+                                    sx={{ fontWeight: 600, mb: 2 }}
                                 >
                                     Author
                                 </Typography>
 
                                 <Box
-                                    component="footer"
+                                    component="section"
                                     sx={{
                                         display: "flex",
                                         alignItems: "center",

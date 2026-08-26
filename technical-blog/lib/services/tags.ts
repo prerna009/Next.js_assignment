@@ -13,15 +13,26 @@ export async function getArticlesByTag(page: number, limit: number, tag: string)
 
     const skip = (page - 1) * limit;
 
-    const res = await axios.get(
-        `${_apiUrl}/tag/${encodeURIComponent(tag)}`,
-        {
-            params: {
-                limit,
-                skip,
-            },
-        }
-    );
+    try {
+        const res = await axios.get(
+            `${_apiUrl}/tag/${encodeURIComponent(tag)}`,
+            {
+                params: {
+                    limit,
+                    skip,
+                },
+            }
+        );
 
-    return res.data;
+        return res.data;
+    } catch (error) {
+        if (
+            axios.isAxiosError(error) &&
+            error.response?.status === 404
+        ) {
+            return null;
+        }
+
+        throw error;
+    }
 };

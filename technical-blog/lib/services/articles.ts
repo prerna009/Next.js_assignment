@@ -5,12 +5,14 @@ const _apiUrl = "https://dummyjson.com/posts";
 export async function getArticles(page: number, limit: number, search: string = "", tag: string = "") {
     const skip = (page - 1) * limit;
 
-    let url = _apiUrl;
+    let url = "";
 
     if (search) {
         url = `${_apiUrl}/search?q=${encodeURIComponent(search)}`;
     } else if (tag) {
         url = `${_apiUrl}/tag/${encodeURIComponent(tag)}`;
+    } else {
+        url = _apiUrl;
     }
 
     const res = await axios.get(url, {
@@ -24,21 +26,20 @@ export async function getArticles(page: number, limit: number, search: string = 
 };
 
 export async function getArticleById(id: number) {
-    if (!id) return null;
+    try {
+        const res = await axios.get(
+            `${_apiUrl}/${id}`
+        );
 
-    const res = await axios.get(`${_apiUrl}/${id}`);
+        return res.data;
+    } catch (error) {
+        if (
+            axios.isAxiosError(error) &&
+            error.response?.status === 404
+        ) {
+            return null;
+        }
 
-    return res.data;
-};
-
-export async function searchArticles(query: string) {
-    if (!query) return null;
-
-    const res = await axios.get(`${_apiUrl}/search`, {
-        params: {
-            q: query,
-        },
-    });
-
-    return res.data;
+        throw error;
+    }
 };

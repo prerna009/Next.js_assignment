@@ -40,7 +40,7 @@ export default async function TagPage({
 
     const tagName = decodeURIComponent(tag);
 
-    const limit = 9;
+    const limit = 5;
 
     const data = await getArticlesByTag(page, limit, tagName);
 

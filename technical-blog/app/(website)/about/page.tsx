@@ -19,7 +19,7 @@ export default function AboutPage() {
                 <Paper
                     component="section"
                     sx={{
-                        my: 8,
+                        my: 16,
                         p: 5,
                     }}
                 >

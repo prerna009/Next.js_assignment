@@ -2,7 +2,7 @@
 
 import { Box, Button, TextField } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface Props {
     initialValue: string;
@@ -15,8 +15,16 @@ export default function SearchInput({ initialValue }: Props) {
 
     const [search, setSearch] = useState<string>(initialValue);
 
-    const handleSearch = () => {
+    const handleSearch = (event: React.FormEvent) => {
+        event.preventDefault();
+
         const params = new URLSearchParams(searchParams.toString());
+
+        // Reset pagination
+        params.delete("page");
+
+        // Search and tag are mutually exclusive
+        params.delete("tag");
 
         if (search.trim()) {
             params.set("search", search.trim());
@@ -24,19 +32,19 @@ export default function SearchInput({ initialValue }: Props) {
             params.delete("search");
         }
 
-        router.push(`${pathname}?${params.toString()}`);
-    }
+        const query = params.toString();
 
-    const handleKeyDown = (
-        event: React.KeyboardEvent<HTMLInputElement>
-    ) => {
-        if (event.key === "Enter") {
-            handleSearch();
-        }
-    };
+        router.push(
+            query
+                ? `${pathname}?${query}`
+                : pathname
+        );
+    }
 
     return (
         <Box
+            component="form"
+            onSubmit={handleSearch}
             sx={{
                 display: "flex",
                 gap: 1,
@@ -46,17 +54,16 @@ export default function SearchInput({ initialValue }: Props) {
             <TextField
                 size="small"
                 fullWidth
-                label="Search articles"
+                placeholder="Search articles..."
                 value={search}
                 onChange={(e) =>
                     setSearch(e.target.value)
                 }
-                onKeyDown={handleKeyDown}
             />
 
             <Button
+                type="submit"
                 variant="contained"
-                onClick={handleSearch}
             >
                 Search
             </Button>

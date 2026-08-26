@@ -1,4 +1,5 @@
 import {
+   Box,
    Container,
    Typography,
 } from "@mui/material";
@@ -36,10 +37,10 @@ export default async function ArticlesPage({
          ? Math.floor(parsedPage)
          : 1;
 
-   const search = params.search || "";
-   const tag = params.tag || "";
+   const search = params.search ?? "";
+   const tag = params.tag ?? "";
 
-   const limit = 9;
+   const limit = 5;
 
    const data = await getArticles(page, limit, search, tag);
 
@@ -66,7 +67,19 @@ export default async function ArticlesPage({
             />
 
             <section aria-label="Article List">
-               <ArticleList articles={data.posts} />
+               {data.posts.length > 0 ? (
+                  <ArticleList articles={data.posts} />
+               ) : (
+                  <Box sx={{ textAlign: "center", py: 8 }}>
+                     <Typography variant="h5">
+                        Search Results Not Found
+                     </Typography>
+
+                     <Typography color="text.secondary">
+                        No articles found for "{search}".
+                     </Typography>
+                  </Box>
+               )}
             </section>
 
             <nav aria-label="Article Pagination">
