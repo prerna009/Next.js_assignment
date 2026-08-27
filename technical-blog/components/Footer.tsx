@@ -1,5 +1,6 @@
 import {
     Box,
+    Typography,
 } from "@mui/material";
 
 export default function Footer() {
@@ -13,9 +14,9 @@ export default function Footer() {
                 color: "white",
             }}
         >
-            <p style={{ textAlign: "center" }}>
+            <Typography component="p" sx={{ textAlign: "center" }}>
                 © 2026 TechBlog. All rights reserved.
-            </p>
+            </Typography>
         </Box>
     );
 }

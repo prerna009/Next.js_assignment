@@ -1,3 +1,4 @@
+import { getArticleById } from "@/lib/services/articles";
 import { ImageResponse } from "next/og";
 
 export const size = {
@@ -7,7 +8,18 @@ export const size = {
 
 export const contentType = "image/png";
 
-export default async function Image() {
+export default async function Image({
+    params,
+}: {
+    params: Promise<{ id: string }>;
+}) {
+
+    const { id } = await params;
+
+    const article = await getArticleById(Number(id));
+
+    const title = article?.title || "TechBlog Article";
+
     return new ImageResponse(
         (
             <div
@@ -17,28 +29,23 @@ export default async function Image() {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
-                    alignItems: "center",
+                    padding: "70px",
                     background: "#111827",
                     color: "white",
-                    padding: "60px",
                 }}
             >
-                <div
-                    style={{
-                        fontSize: 80,
-                        fontWeight: "bold",
-                    }}
-                >
-                    TechBlog
+                <div style={{ fontSize: 40 }}>
+                    TECHBLOG
                 </div>
 
                 <div
                     style={{
-                        fontSize: 36,
-                        marginTop: 20,
+                        fontSize: 64,
+                        fontWeight: "bold",
+                        marginTop: 30,
                     }}
                 >
-                    Learn. Build. Explore.
+                    {title}
                 </div>
             </div>
         ),

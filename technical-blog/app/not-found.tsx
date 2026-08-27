@@ -8,15 +8,15 @@ export default function NotFound() {
             aria-label="Not Found"
         >
             <div className="text-center">
-                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+                <Typography component="h3" variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
                     Page Not Found
                 </Typography>
 
-                <Button variant="contained">
-                    <Link href={"/"}>
+                <Link href="/">
+                    <Button variant="contained">
                         Back To Home
-                    </Link>
-                </Button>
+                    </Button>
+                </Link>
             </div>
         </main>
     );

@@ -19,6 +19,8 @@ export async function generateMetadata({
 
     const article = await getArticleById(Number(id));
 
+    const siteUrl = process.env.SITE_URL || "http://localhost:3000";
+
     if (!article) {
         return {
             title: "Article Not Found",
@@ -26,22 +28,63 @@ export async function generateMetadata({
         };
     }
 
-    const description = article.body.slice(0, 160);
+    const title = article.title || "TechBlog Article";
+    const description = article.body.slice(0, 160) || "Read this article on TechBlog.";
+    const canonicalUrl = `${siteUrl}/articles/${id}`;
 
     return {
-        title: article.title,
+        title,
         description,
 
+        keywords: [
+            "TechBlog",
+            "Technology",
+            "Programming",
+            "Web Development",
+        ],
+
+        authors: [
+            {
+                name: "TechBlog",
+            },
+        ],
+
+        publisher: "TechBlog",
+
+        category: "Technology",
+
+        robots: {
+            index: true,
+            follow: true,
+        },
+
+        alternates: {
+            canonical: canonicalUrl,
+        },
+
         openGraph: {
-            title: article.title,
+            title,
             description,
+            url: canonicalUrl,
+            siteName: "TechBlog",
             type: "article",
+            images: [
+                {
+                    url: `${siteUrl}/articles/${id}/opengraph-image`,
+                    width: 1200,
+                    height: 630,
+                    alt: title,
+                },
+            ],
         },
 
         twitter: {
             card: "summary_large_image",
-            title: article.title,
+            title,
             description,
+            images: [
+                `${siteUrl}/articles/${id}/twitter-image`,
+            ],
         },
     };
 }

@@ -1,9 +1,14 @@
 import axios from "axios";
+import { unstable_cache } from "next/cache";
 
 const _apiUrl = "https://dummyjson.com/posts";
 
-export async function getArticles(page: number, limit: number, search: string = "", tag: string = "") {
-    const skip = (page - 1) * limit;
+export async function getArticles(page?: number, limit?: number, search: string = "", tag: string = "") {
+    let skip = 0;
+
+    if (page && limit) {
+        skip = (page - 1) * limit;
+    }
 
     let url = "";
 
@@ -25,7 +30,7 @@ export async function getArticles(page: number, limit: number, search: string = 
     return res.data;
 };
 
-export async function getArticleById(id: number) {
+export async function fetchArticleById(id: number) {
     try {
         const res = await axios.get(
             `${_apiUrl}/${id}`
@@ -43,3 +48,13 @@ export async function getArticleById(id: number) {
         throw error;
     }
 };
+
+export const getArticleById = (id: number) =>
+    unstable_cache(
+        () => fetchArticleById(id),
+        [`article-${id}`],
+        {
+            revalidate: 3600,
+            tags: [`article-${id}`],
+        }
+    )();

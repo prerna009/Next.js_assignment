@@ -21,7 +21,7 @@ export default function Header() {
                 }}
             >
                 {/* Logo */}
-                <Typography variant="h6">TechBlog</Typography>
+                <Typography component="h1" variant="h6">TechBlog</Typography>
 
                 {/* Navbar */}
                 <Box
