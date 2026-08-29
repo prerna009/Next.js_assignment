@@ -1,12 +1,12 @@
-import { getArticleById } from "@/lib/services/articles";
+import { getArticleById, getArticles } from "@/lib/services/articles";
 import { getUser } from "@/lib/services/users";
 import { Article } from "@/lib/types/article";
 import { User } from "@/lib/types/user";
 import { Box, Chip, Container, Paper, Typography } from "@mui/material";
-
 import Image from "next/image";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 interface Props {
     params: Promise<{ id: string }>;
@@ -36,12 +36,7 @@ export async function generateMetadata({
         title,
         description,
 
-        keywords: [
-            "TechBlog",
-            "Technology",
-            "Programming",
-            "Web Development",
-        ],
+        keywords: article.tag,
 
         authors: [
             {
@@ -68,25 +63,31 @@ export async function generateMetadata({
             url: canonicalUrl,
             siteName: "TechBlog",
             type: "article",
-            images: [
-                {
-                    url: `${siteUrl}/articles/${id}/opengraph-image`,
-                    width: 1200,
-                    height: 630,
-                    alt: title,
-                },
-            ],
         },
 
         twitter: {
             card: "summary_large_image",
             title,
             description,
-            images: [
-                `${siteUrl}/articles/${id}/twitter-image`,
-            ],
         },
     };
+}
+
+async function getRelatedArticles(currentArticle: Article, limit: number = 3) {
+    try {
+        if (!currentArticle.tags || currentArticle.tags.length === 0) {
+            return [];
+        }
+
+        const firstTag = currentArticle.tags[0];
+        const res = await getArticles(1, 50, "", firstTag);
+        
+        return (res?.posts || [])
+            .filter((article: Article) => article.id !== currentArticle.id)
+            .slice(0, limit);
+    } catch {
+        return [];
+    }
 }
 
 export default async function ArticlePage({ params }: Props) {
@@ -99,6 +100,7 @@ export default async function ArticlePage({ params }: Props) {
     }
 
     const author: User = await getUser(Number(article.userId));
+    const relatedArticles = await getRelatedArticles(article, 3);
 
     const stats = [
         ["Views", article.views],
@@ -224,6 +226,48 @@ export default async function ArticlePage({ params }: Props) {
                                     </Box>
                                 </Box>
                             </section>
+                        )}
+
+                        {/* Related Articles */}
+                        {relatedArticles && relatedArticles.length > 0 && (
+                            <Box component="section" aria-labelledby="related-articles-heading" sx={{ mt: 6, pt: 4, borderTop: "1px solid #e0e0e0" }}>
+                                <Typography
+                                    id="related-articles-heading"
+                                    variant="h6"
+                                    sx={{ fontWeight: 600, mb: 3 }}
+                                >
+                                    Related Articles
+                                </Typography>
+
+                                <Box sx={{ display: "grid", gap: 2 }}>
+                                    {relatedArticles.map((relatedArticle: Article) => (
+                                        <Link
+                                            key={relatedArticle.id}
+                                            href={`/articles/${relatedArticle.id}`}
+                                            style={{ textDecoration: "none" }}
+                                        >
+                                            <Paper
+                                                sx={{
+                                                    p: 2,
+                                                    cursor: "pointer",
+                                                    transition: "all 0.3s ease",
+                                                    "&:hover": {
+                                                        boxShadow: 2,
+                                                        transform: "translateY(-2px)",
+                                                    },
+                                                }}
+                                            >
+                                                <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+                                                    {relatedArticle.title}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {relatedArticle.body.substring(0, 100)}...
+                                                </Typography>
+                                            </Paper>
+                                        </Link>
+                                    ))}
+                                </Box>
+                            </Box>
                         )}
                     </Paper>
                 </article>

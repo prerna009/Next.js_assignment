@@ -9,7 +9,7 @@ export default function NotFound() {
         >
             <div className="text-center">
                 <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
-                    Tags Not Found
+                    Tag Not Found
                 </Typography>
 
                 <Button variant="contained" size="small">

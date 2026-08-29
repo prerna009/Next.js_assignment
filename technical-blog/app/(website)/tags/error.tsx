@@ -39,6 +39,7 @@ export default function Error({
                 <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
                     <Button
                         variant="contained"
+                        size="small"
                         onClick={reset}
                     >
                         Try Again
@@ -46,6 +47,7 @@ export default function Error({
 
                     <Button
                         variant="outlined"
+                        size="small"
                         onClick={handleBack}
                     >
                         Back To Tags

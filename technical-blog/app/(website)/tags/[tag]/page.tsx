@@ -51,24 +51,16 @@ export default async function TagPage({
     return (
         <main>
             <Container maxWidth="lg" sx={{ py: 4 }}>
-                <header>
-                    <Typography
-                        variant="h4"
-                        sx={{
-                            fontWeight: 700,
-                            mb: 1,
-                        }}
-                    >
-                        {tagName} Articles
-                    </Typography>
-
-                    <Typography
-                        color="text.secondary"
-                        sx={{ mb: 4 }}
-                    >
-                        Articles related to the "{tagName}" tag.
-                    </Typography>
-                </header>
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    sx={{
+                        fontWeight: 700,
+                        mb: 1,
+                    }}
+                >
+                    {tagName} Articles
+                </Typography>
 
                 <section aria-label={`${tagName} articles`}>
                     <ArticleList
